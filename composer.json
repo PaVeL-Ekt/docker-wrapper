@@ -1,0 +1,29 @@
+{
+  "name": "pavel-ekt/docker-wrapper",
+  "description": "provides a simple way to work with docker shell commands",
+  "keywords": [
+    "docker",
+    "shell",
+    "wrapper",
+    "docker-wrapper",
+    "container"
+  ],
+  "homepage": "",
+  "license": "BSD-3-Clause",
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "Pavel Chernoskutov",
+      "email": "pavel-ekt@yandex.ru"
+    }
+  ],
+  "require": {
+    "php": ">= 5.4",
+    "pavel-ekt/shell-wrapper": "1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "PavelEkt\\Wrappers\\": "src"
+    }
+  }
+}
