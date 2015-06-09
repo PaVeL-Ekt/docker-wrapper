@@ -238,6 +238,30 @@ class Docker extends DockerExt
         return false;
     }
 
+    public function login($userName, $password, $email = "")
+    {
+        if (
+            $this->params['shell']->exec(
+                'docker login -u ' . $userName . ' -p ' . $password . ' -e ' . $email, $out
+            ) == 0
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public function pullImage($imageName)
+    {
+        if (
+            $this->params['shell']->exec(
+                'docker pull ' . $imageName, $out
+            ) == 0
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     public function eventListener(&$object, $event)
     {
         if ($object instanceof DockerExt) {
