@@ -13,6 +13,7 @@ class Docker extends DockerExt
      * @var string $dockerCommand полный путь до исполняемого файла docker
      */
     public $dockerCommand = '/usr/bin/docker';
+    protected $server = '';
 
 
     public function parseLine($line, $fieldsList)
@@ -50,8 +51,9 @@ class Docker extends DockerExt
         return $result;
     }
 
-    public function __construct($shell = null)
+    public function __construct($server = null, $shell = null)
     {
+        $this->server = $server;
         $this->params['docker'] = $this;
         if ($shell instanceof ShellWrapper) {
             $this->params['shell'] = $shell;
@@ -242,7 +244,7 @@ class Docker extends DockerExt
     {
         if (
             $this->params['shell']->exec(
-                'docker login -u ' . $userName . ' -p ' . $password . ' -e ' . $email, $out
+                'docker login -u ' . $userName . ' -p ' . $password . ' -e "' . $email . '" ' . $this->server, $out
             ) == 0
         ) {
             return true;
