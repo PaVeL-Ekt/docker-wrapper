@@ -252,6 +252,11 @@ class Docker extends DockerExt
         return false;
     }
 
+    public function server()
+    {
+        return $this->server;
+    }
+
     public function pullImage($imageName)
     {
         if (
@@ -271,5 +276,15 @@ class Docker extends DockerExt
                 $object = null;
             }
         }
+    }
+
+    public function registerListener($name, $listener)
+    {
+        $this->params['shell']->registerListener($name, $listener);
+    }
+
+    public function unregisterListener($name)
+    {
+        $this->params['shell']->unregisterListener($name);
     }
 }

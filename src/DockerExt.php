@@ -21,7 +21,7 @@ class DockerExt
         } else {
             $this->params['docker'] = new Docker();
         }
-        $this->params['shell'] = new Shell($this->params['docker']->getShell($this)->workDirectory);
+        $this->params['shell'] = $this->params['docker']->getShell($this);
         foreach (static::parseShellLineFields() as $key => $value) {
             if (isset($params[$key])) {
                 $this->params['subParams'][$key] = $params[$key];
