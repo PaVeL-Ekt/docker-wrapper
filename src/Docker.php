@@ -254,19 +254,19 @@ class Docker extends DockerControllerAbstract
         return false;
     }
 
-    public function registerListener($name, $object)
+    public function subscribeObject($name, $object)
     {
-        if (method_exists($this->shell, 'registerListener')) {
-            $this->shell->registerListener($name, $object);
+        if (method_exists($this->shell, 'subscribeObject')) {
+            $this->shell->subscribeObject($name, $object);
             return true;
         }
         return false;
     }
 
-    public function unregisterListener($name)
+    public function unsubscribeObject($name)
     {
-        if (method_exists($this->shell, 'unregisterListener')) {
-            $this->shell->unregisterListener($name);
+        if (method_exists($this->shell, 'unsubscribeObject')) {
+            $this->shell->unsubscribeObject($name);
             return true;
         }
         return false;
