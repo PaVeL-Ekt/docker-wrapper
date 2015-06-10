@@ -28,7 +28,7 @@ class DockerImage extends DockerRemovableElementAbstract
 
     protected function callContainers()
     {
-        $this->docker->getContainers();
+        return $this->docker->getContainers(DockerContainer::STATUS_ALL, null, $this);
     }
 
 
