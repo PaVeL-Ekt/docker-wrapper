@@ -19,7 +19,7 @@
   ],
   "require": {
     "php": ">= 5.4",
-    "pavel-ekt/shell-wrapper": "1.1"
+    "pavel-ekt/shell-wrapper": "*"
   },
   "autoload": {
     "psr-4": {
