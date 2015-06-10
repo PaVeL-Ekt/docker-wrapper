@@ -2,19 +2,21 @@
 
 namespace PavelEkt\Wrappers;
 
-class DockerImage extends DockerExt
+use PavelEkt\Wrappers\Docker\Abstracts\DockerRemovableElementAbstract;
+use PavelEkt\Wrappers\Docker\Exceptions\Exception as DockerException;
+
+class DockerImage extends DockerRemovableElementAbstract
 {
-    protected function callRemove($force = false) {
+    protected function callRemove($force = false)
+    {
         $out = [];
         if (
-            $this->params['shell']->exec(
-                'docker rmi '. ($force === true ? '-f ' : '') . $this->image_id,
+            $this->getShell()->exec(
+                $this->docker->dockerCommand . ' rmi '. ($force === true ? '-f ' : '') . $this->image_id,
                 $out
             ) === 0
         ) {
-            $this->params['deleted'] = true;
-            $this->params['docker']->eventListener($this, 'remove');
-            return true;
+            parent::callRemove();
         } else {
             throw new DockerException(
                 'Can`t remove image.',
@@ -24,10 +26,16 @@ class DockerImage extends DockerExt
         }
     }
 
+    protected function callContainers()
+    {
+        $this->docker->getContainers();
+    }
+
+
     public function run($script = null, array $params = [], array $scriptParams = [], &$output = null)
     {
         $out = [];
-        $cmd = 'docker run';
+        $cmd = $this->docker->dockerCommand . ' run';
         if (!empty($params['mount-dirs'])) {
             foreach ($params['mount-dirs'] as $rootDir => $dockerDir) {
                 if (is_dir($rootDir)) {
@@ -50,7 +58,7 @@ class DockerImage extends DockerExt
             $cmd .= ' ' . $key . '=' . $value;
         }
 
-        if ($this->params['shell']->exec($cmd, $out) !== 0) {
+        if ($this->getShell()->exec($cmd, $out) !== 0) {
             throw new DockerException(
                 'Can`t run image.',
                 implode(

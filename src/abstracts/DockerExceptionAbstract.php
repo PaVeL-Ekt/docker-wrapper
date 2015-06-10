@@ -1,8 +1,8 @@
 <?php
 
-namespace PavelEkt\Wrappers;
+namespace PavelEkt\Wrappers\Docker\Abstracts;
 
-class DockerException extends \Exception
+abstract class DockerExceptionAbstract extends \Exception
 {
     const DOCKER_NO_GROUP_ERRORS = -1;
     const DOCKER_ERRORS = 0;

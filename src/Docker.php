@@ -2,12 +2,12 @@
 
 namespace PavelEkt\Wrappers;
 
-use PavelEkt\Wrappers\Shell as ShellWrapper;
+use PavelEkt\Wrappers\Docker\Abstracts\DockerControllerAbstract;
 
 /**
  * Класс для работы с докер контейнером.
  */
-class Docker extends DockerExt
+class Docker extends DockerControllerAbstract
 {
      /**
      * @var string $dockerCommand полный путь до исполняемого файла docker
@@ -51,17 +51,10 @@ class Docker extends DockerExt
         return $result;
     }
 
-    public function __construct($server = null, $shell = null)
+    public function __construct($server = null, $shell = null, $params = [])
     {
+        parent::__construct($shell, $params);
         $this->server = $server;
-        $this->params['docker'] = $this;
-        if ($shell instanceof ShellWrapper) {
-            $this->params['shell'] = $shell;
-        } elseif (is_string($shell) && is_dir($shell)) {
-            $this->params['shell'] = new ShellWrapper($shell);
-        } else {
-            $this->params['shell'] = new ShellWrapper(__DIR__);
-        }
     }
 
     public function getImages($nameOrId = null)
@@ -79,7 +72,7 @@ class Docker extends DockerExt
                 }
             }
         }
-        if ($this->params['shell']->exec('docker images --no-trunc', $out) == 0) {
+        if ($this->shell->exec($this->dockerCommand . ' images --no-trunc', $out) == 0) {
             $fieldsList = $this->parseFieldsLine($out['stdout'][0], DockerImage::parseShellLineFields());
             for ($i = 1, $ic = sizeof($out['stdout']); $i < $ic; ++$i) {
                 $parsedLine = $this->parseLine($out['stdout'][$i], $fieldsList);
@@ -142,7 +135,7 @@ class Docker extends DockerExt
             }
         }
 
-        if ($this->params['shell']->exec('docker ps' . $param . ' --no-trunc', $out) == 0) {
+        if ($this->shell->exec($this->dockerCommand . ' ps' . $param . ' --no-trunc', $out) == 0) {
             $fieldsList = $this->parseFieldsLine($out['stdout'][0], DockerContainer::parseShellLineFields());
             for ($i = 1, $ic = sizeof($out['stdout']); $i < $ic; ++$i) {
                 $parsedLine = $this->parseLine($out['stdout'][$i], $fieldsList);
@@ -204,14 +197,6 @@ class Docker extends DockerExt
         return null;
     }
 
-    public function getShell($object)
-    {
-        if ($object instanceof DockerExt) {
-            return $this->params['shell'];
-        }
-        return null;
-    }
-
     public function removeContainer($container, $force = false)
     {
         if ($container instanceof DockerContainer) {
@@ -236,15 +221,15 @@ class Docker extends DockerExt
         if ($image instanceof DockerImage) {
             return $image->run($script, $params, $scriptParams, $output);
         }
-
         return false;
     }
 
     public function login($userName, $password, $email = "")
     {
         if (
-            $this->params['shell']->exec(
-                'docker login -u ' . $userName . ' -p ' . $password . ' -e "' . $email . '" ' . $this->server, $out
+            $this->shell->exec(
+                $this->dockerCommand . ' login -u ' . $userName . ' -p ' . $password . ' -e "' . $email . '" ' . $this->server,
+                $out
             ) == 0
         ) {
             return true;
@@ -260,8 +245,8 @@ class Docker extends DockerExt
     public function pullImage($imageName)
     {
         if (
-            $this->params['shell']->exec(
-                'docker pull ' . $imageName, $out
+            $this->shell->exec(
+                $this->dockerCommand . ' pull ' . $imageName, $out
             ) == 0
         ) {
             return true;
@@ -269,22 +254,21 @@ class Docker extends DockerExt
         return false;
     }
 
-    public function eventListener(&$object, $event)
+    public function registerListener($name, $object)
     {
-        if ($object instanceof DockerExt) {
-            if ($event == 'remove') {
-                $object = null;
-            }
+        if (method_exists($this->shell, 'registerListener')) {
+            $this->shell->registerListener($name, $object);
+            return true;
         }
-    }
-
-    public function registerListener($name, $listener)
-    {
-        $this->params['shell']->registerListener($name, $listener);
+        return false;
     }
 
     public function unregisterListener($name)
     {
-        $this->params['shell']->unregisterListener($name);
+        if (method_exists($this->shell, 'unregisterListener')) {
+            $this->shell->unregisterListener($name);
+            return true;
+        }
+        return false;
     }
 }

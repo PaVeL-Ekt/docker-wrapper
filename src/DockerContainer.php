@@ -2,7 +2,10 @@
 
 namespace PavelEkt\Wrappers;
 
-class DockerContainer extends DockerExt
+use PavelEkt\Wrappers\Docker\Abstracts\DockerRemovableElementAbstract;
+use PavelEkt\Wrappers\Docker\Exceptions\Exception as DockerException;
+
+class DockerContainer extends DockerRemovableElementAbstract
 {
     const STATUS_ALL = 'all';
     const STATUS_RESTARTING = 'restarting';
@@ -12,8 +15,8 @@ class DockerContainer extends DockerExt
 
     protected function getImageParam()
     {
-        if (!empty($this->params['subParams']['image'])) {
-            return $this->params['docker']->getImage($this->params['subParams']['image']);
+        if (!empty($this->params['image'])) {
+            return $this->docker->getImage($this->params['image']);
         }
         return null;
     }
@@ -22,14 +25,12 @@ class DockerContainer extends DockerExt
     {
         $out = [];
         if (
-            $this->params['shell']->exec(
-                'docker rm '. ($force === true ? '-f ' : '') . $this->container_id,
+            $this->getShell()->exec(
+                $this->docker->dockerCommand . ' rm '. ($force === true ? '-f ' : '') . $this->container_id,
                 $out
             ) === 0
         ) {
-            $this->params['deleted'] = true;
-            $this->params['docker']->eventListener($this, 'remove');
-            return true;
+            parent::callRemove();
         } else {
             throw new DockerException(
                 'Can`t remove container.',

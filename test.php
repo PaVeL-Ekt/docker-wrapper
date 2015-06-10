@@ -6,7 +6,7 @@
  * Time: 11:13
  */
 
-require_once('./src/DockerExt.php');
+require_once('./src/DockerAbstact.php');
 require_once('./src/Docker.php');
 
 use PavelEkt\Wrappers\Docker;

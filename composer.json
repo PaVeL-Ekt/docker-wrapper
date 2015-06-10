@@ -23,7 +23,9 @@
   },
   "autoload": {
     "psr-4": {
-      "PavelEkt\\Wrappers\\": "src"
+      "PavelEkt\\Wrappers\\": "src",
+      "PavelEkt\\Wrappers\\Docker\\Abstracts\\": "src/abstracts",
+      "PavelEkt\\Wrappers\\Docker\\Exceptions\\": "src/exceptions"
     }
   }
 }
